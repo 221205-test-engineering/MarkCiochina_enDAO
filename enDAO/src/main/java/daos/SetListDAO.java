@@ -1,5 +1,6 @@
 package daos;
 
+import interfaces.DAOInterface;
 import tablemodels.SetItem;
 import util.ConnectionUtility;
 
@@ -10,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SetListDAO implements DAOInterface<SetItem>{
+public class SetListDAO implements DAOInterface<SetItem> {
 
     private static ConnectionUtility connectObj = ConnectionUtility.getConnectionObject();
 
@@ -32,7 +33,7 @@ public class SetListDAO implements DAOInterface<SetItem>{
     }
 
     @Override
-    public void delete(int id) {
+    public void deleteById(int id) {
 
         String sql = "delete from setlist where id=?";
 
@@ -50,13 +51,14 @@ public class SetListDAO implements DAOInterface<SetItem>{
     @Override
     public void edit(SetItem s) {
 
-        String sql = "select * from setlist where song_id=? and show_id=?";
+        String sql = "update * from setlist set title=? where song_id=? and show_id=?";
 
         try(Connection connection = connectObj.getConnection()){
 
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, s.getSong_id());
-            ps.setInt(2,s.getShow_id());
+            ps.setString(1,s.getTitle());
+            ps.setInt(2, s.getSong_id());
+            ps.setInt(3,s.getShow_id());
             ps.execute();
             System.out.println("Set item edited by song_id : '" + s.getSong_id() + "', show_id : '" + s.getShow_id() + "'");
 
@@ -69,7 +71,7 @@ public class SetListDAO implements DAOInterface<SetItem>{
     @Override
     public List<SetItem> getAllRecords() {
 
-        List<SetItem> allSetPieces = new ArrayList<>();
+        List<SetItem> allSetItems = new ArrayList<>();
 
         String sql = "select * from setlist";
 
@@ -79,9 +81,9 @@ public class SetListDAO implements DAOInterface<SetItem>{
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 SetItem n = new SetItem(rs.getInt("song_id"), rs.getString("title"), rs.getInt("show_id"));
-                allSetPieces.add(n);
+                allSetItems.add(n);
             }
-            return allSetPieces;
+            return allSetItems;
         } catch(SQLException e){
             e.printStackTrace();
         }
@@ -89,18 +91,19 @@ public class SetListDAO implements DAOInterface<SetItem>{
     }
 
     @Override
-    public SetItem getById(SetItem s) {
-
-        String sql = "select * from setlist where song_id=?, show_id=?";
+    public SetItem getById(int id) { //used to be song object to query both song_id and show_id - to be modified
+ // this method doesn't work with generic implementation, must be overloaded to accept 2 ids
+        //when run with 1 id it refers to song id and will return the first instance of the song
+        String sql = "select * from setlist where song_id=?";
 
         try(Connection connection = connectObj.getConnection()){
 
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, s.getSong_id());
-            ps.setInt(2, s.getShow_id());
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-
+            rs.next();
             SetItem n = new SetItem(rs.getInt("song_id"), rs.getString("title"), rs.getInt("show_id"));
+            System.out.println("this method doesn't work with generic implementation, must be overloaded to accept 2 ids. when run with 1 id it refers to song id and will return the first instance of the song");
             return n;
         }catch (SQLException e){
             e.printStackTrace();

@@ -1,5 +1,6 @@
 package daos;
 
+import interfaces.DAOInterface;
 import tablemodels.Songs;
 import util.ConnectionUtility;
 
@@ -10,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SongsDAO implements DAOInterface<Songs>{
+public class SongsDAO implements DAOInterface<Songs> {
 
     private static ConnectionUtility connectObj = ConnectionUtility.getConnectionObject();
     @Override
@@ -29,13 +30,11 @@ public class SongsDAO implements DAOInterface<Songs>{
         } catch(SQLException e){
             e.printStackTrace();
         }
-
-
     }
 
     @Override
-    public void delete(int id) {
-        String sql = "delete from songs where id=?";
+    public void deleteById(int id) {
+        String sql = "delete from songs where song_id=?";
 
         try(Connection connection = connectObj.getConnection()){
 
@@ -52,7 +51,7 @@ public class SongsDAO implements DAOInterface<Songs>{
     @Override
     public void edit(Songs s) {
 
-        String sql = "update songs set title=?, duration=? where id=?";
+        String sql = "update songs set title=?, duration=? where song_id=?";
 
         try(Connection connection = connectObj.getConnection()){
 
@@ -78,7 +77,7 @@ public class SongsDAO implements DAOInterface<Songs>{
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
-                Songs n = new Songs(rs.getInt("id"), rs.getString("title"), rs.getInt("duration"));
+                Songs n = new Songs(rs.getInt("song_id"), rs.getString("title"), rs.getInt("duration"));
                 allSongs.add(n);
             }
             return allSongs;
@@ -90,15 +89,16 @@ public class SongsDAO implements DAOInterface<Songs>{
     }
 
     @Override
-    public Songs getById(Songs s) {
+    public Songs getById(int id) {
 
-        String sql = "select * from songs where id=?";
+        String sql = "select * from songs where song_id=?";
 
         try(Connection connection = connectObj.getConnection()){
 
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, s.getSong_id());
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
+            rs.next();
             Songs n = new Songs(rs.getInt("song_id"), rs.getString("title"), rs.getInt("duration"));
             return n;
         } catch(SQLException e){

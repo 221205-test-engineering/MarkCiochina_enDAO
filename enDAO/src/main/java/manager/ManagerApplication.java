@@ -9,7 +9,7 @@ import tablemodels.TourLocations;
 
 import java.util.Scanner;
 
-public class ManagerApplication {
+public class ManagerApplication { //trial application for commandline
 
     public static void main(String[] args){
         TourLocationsDAO tldao = new TourLocationsDAO();
@@ -44,8 +44,6 @@ public class ManagerApplication {
         setDAO.add(i2);
         setDAO.add(i3);
         setDAO.add(i4);
-
-        tldao.delete(10);
 
     }
 }

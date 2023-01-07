@@ -1,5 +1,6 @@
 package daos;
 
+import interfaces.DAOInterface;
 import tablemodels.TourLocations;
 import util.ConnectionUtility;
 
@@ -50,7 +51,7 @@ public class TourLocationsDAO implements DAOInterface<TourLocations> {
     }
 
     @Override
-    public void delete(int id) {
+    public void deleteById(int id) {
 
         String sql = "delete from tourlocations where id=?";
 
@@ -70,7 +71,7 @@ public class TourLocationsDAO implements DAOInterface<TourLocations> {
     @Override
     public void edit(TourLocations location) {
 
-        String sql = "update tourlocations city=?, day_and_month=? where id=?";
+        String sql = "update tourlocations set city=?, day_and_month=? where id=?";
 
         try(Connection connection = connectObj.getConnection()){
 
@@ -99,7 +100,6 @@ public class TourLocationsDAO implements DAOInterface<TourLocations> {
                 int id = rs.getInt("id");
                 String city = rs.getString("city");
                 int day_and_month = rs.getInt("day_and_month");
-
                 TourLocations newLoc = new TourLocations(id, city, day_and_month);
                 allLocations.add(newLoc);
             }
@@ -112,14 +112,14 @@ public class TourLocationsDAO implements DAOInterface<TourLocations> {
     }
 
     @Override
-    public TourLocations getById(TourLocations location) {
+    public TourLocations getById(int id) {
         TourLocations targetLocation = new TourLocations();
         String sql = "select * from tourlocations where id=?";
 
         try(Connection connection = connectObj.getConnection()){
 
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1,location.getId());
+            ps.setInt(1,id);
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
@@ -128,7 +128,7 @@ public class TourLocationsDAO implements DAOInterface<TourLocations> {
                 targetLocation.setDay_and_month(rs.getInt("day_and_month"));
             }
 
-            System.out.println("Tour location returned by ID : " + location.getId());
+            System.out.println("Tour location returned by ID : " + String.valueOf(id));
             return targetLocation;
         }catch (SQLException e){
             e.printStackTrace();
